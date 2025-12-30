@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lumina Library 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Light Theme */
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --surface-glass: rgba(255, 255, 255, 0.7);
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #ec4899;
+            --border: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-glass: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --border: #334155;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+
+        /* --- Header & Nav --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions { display: flex; gap: 10px; }
+
+        .icon-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--primary); color: var(--primary); }
+
+        /* --- Dashboard Stats --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-icon { position: absolute; right: 15px; top: 15px; font-size: 1.5rem; opacity: 0.1; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; display: block; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- Toolbar --- */
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .filter-btn {
+            padding: 0 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* --- Book Grid --- */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .book-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); z-index: 2; }
+
+        .book-cover-area {
+            height: 140px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .book-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, var(--surface) 5%, transparent 100%);
+        }
+
+        .book-status-badge {
+            position: absolute; top: 15px; right: 15px;
+            padding: 4px 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .book-body { padding: 15px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+        
+        .book-title { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px 0; line-height: 1.3; }
+        .book-author { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
+
+        .progress-container { margin-bottom: 15px; }
+        .progress-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+        .progress-bar { height: 100%; background: var(--primary); border-radius: 3px; width: 0%; transition: width 0.5s ease; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+        .book-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        
+        .btn-read { background: var(--primary); color: white; }
+        .btn-read:hover { background: var(--primary-dark); }
+        .btn-edit { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-edit:hover { background: var(--bg); color: var(--text-main); }
+
+        /* --- Floating Action Button --- */
+        .fab {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none; border-radius: 50%;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            cursor: pointer;
+            z-index: 90;
+            transition: transform 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fab:hover { transform: scale(1.1) rotate(90deg); }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal {
+            background: var(--surface);
+            width: 90%; max-width: 500px;
+            border-radius: 24px;
+            padding: 30px;
+            transform: scale(0.95); transition: transform 0.3s;
+            max-height: 90vh; overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-size: 1.4rem; font-weight: 700; margin: 0; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
+
+        .form-grid { display: grid; gap: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
+        .input-field {
+            width: 100%; padding: 12px;
+            border-radius: 12px; border: 2px solid var(--border);
+            background: var(--bg); color: var(--text-main);
+            font-size: 1rem; font-family: inherit;
+            transition: 0.2s;
+        }
+        .input-field:focus { border-color: var(--primary); background: var(--surface); }
+
+        .btn-primary {
+            width: 100%; padding: 14px;
+            background: var(--primary); color: white;
+            border: none; border-radius: 12px;
+            font-weight: 700; font-size: 1rem;
+            cursor: pointer; margin-top: 10px;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: transparent; color: #ef4444; width: auto; margin-top: 15px; padding: 10px; border: 1px solid transparent; }
+        .btn-danger:hover { background: #fee2e2; }
+
+        /* --- Timer Interface --- */
+        .timer-display { font-size: 4rem; font-weight: 800; font-variant-numeric: tabular-nums; text-align: center; margin: 20px 0; letter-spacing: -2px; }
+        .timer-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .btn-circle { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-start { background: #10b981; color: white; }
+        .btn-stop { background: #ef4444; color: white; }
+        .btn-pause { background: #f59e0b; color: white; }
+
+        /* --- Toast Notification --- */
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--surface); color: var(--text-main);
+            padding: 12px 24px; border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            font-weight: 600; display: flex; align-items: center; gap: 10px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200; border: 1px solid var(--primary);
+        }
+        #toast.visible { transform: translateX(-50%) translateY(0); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); grid-column: 1 / -1; }
+        .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; display: block; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <h1>Lumina</h1>
+                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;" id="dateDisplay"></div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme"><i class="ri-moon-line"></i></button>
+                <button class="icon-btn" onclick="exportData()" title="Backup Data"><i class="ri-download-cloud-2-line"></i></button>
+                <label class="icon-btn" title="Restore Data" style="cursor: pointer;">
+                    <i class="ri-upload-cloud-2-line"></i>
+                    <input type="file" id="importFile" style="display: none;" onchange="importData(this)">
+                </label>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="ri-fire-line stat-icon"></i>
+                <span class="stat-value" id="statStreak">0</span>
+                <span class="stat-label">Day Streak</span>
+            </div>
+            <div class="stat-card">
+                <i class="ri-book-open-line stat-icon"></i>
+                <span class="stat-value" id="statRead">0</span>
+                <span class="stat-label">Pages Read</span>
+            </div>
+            <div class="stat-card">
+                <i class="ri-checkbox-circle-line stat-icon"></i>
+                <span class="stat-value" id="statFinished" style="color: #10b981;">0</span>
+                <span class="stat-label">Books Finished</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="ri-search-line search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search title or author..." onkeyup="renderLibrary()">
+            </div>
+            <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+            <button class="filter-btn" onclick="setFilter('reading', this)">Reading</button>
+            <button class="filter-btn" onclick="setFilter('toread', this)">To Read</button>
+            <button class="filter-btn" onclick="setFilter('finished', this)">Finished</button>
+        </div>
+
+        <div id="libraryGrid" class="library-grid">
+            </div>
+    </div>
+
+    <button class="fab" onclick="openBookModal()">
+        <i class="ri-add-line"></i>
+    </button>
+
+    <div class="modal-overlay" id="bookModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitleText">Add Book</h2>
+                <button class="close-btn" onclick="closeModal('bookModal')"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="form-grid">
+                <input type="hidden" id="editIndex">
+                
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" id="inpTitle" class="input-field" placeholder="Book Name">
+                </div>
+                
+                <div class="input-group">
+                    <label>Author</label>
+                    <input type="text" id="inpAuthor" class="input-field" placeholder="Author Name">
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Total Pages</label>
+                        <input type="number" id="inpTotal" class="input-field" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Current Page</label>
+                        <input type="number" id="inpCurrent" class="input-field" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Cover Image URL (Optional)</label>
+                    <input type="url" id="inpCover" class="input-field" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Genre</label>
+                        <select id="inpGenre" class="input-field">
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Business">Business</option>
+                            <option value="Self-Help">Self-Help</option>
+                            <option value="Biography">Biography</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Rating (0-10)</label>
+                        <input type="number" id="inpRating" class="input-field" max="10" min="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Notes / Review</label>
+                    <textarea id="inpNotes" class="input-field" rows="3"></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="saveBook()">Save Book</button>
+                <button class="btn-danger" id="btnDelete" onclick="deleteCurrentBook()" style="display:none; width:100%">Delete Book</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timerModal">
+        <div class="modal" style="text-align: center;">
+            <div class="modal-header">
+                <h2 class="modal-title">Reading Session</h2>
+                <button class="close-btn" onclick="closeTimerModal()"><i class="ri-close-line"></i></button>
+            </div>
+            
+            <p id="timerBookTitle" style="color:var(--text-muted); margin-top:-15px;">Book Title</p>
+
+            <div class="timer-display" id="stopwatch">00:00:00</div>
+            
+            <div class="timer-controls">
+                <button class="btn-circle btn-start" onclick="startTimer()"><i class="ri-play-fill"></i></button>
+                <button class="btn-circle btn-pause" onclick="pauseTimer()"><i class="ri-pause-fill"></i></button>
+                <button class="btn-circle btn-stop" onclick="stopTimer()"><i class="ri-stop-fill"></i></button>
+            </div>
+
+            <div id="sessionLogForm" style="display: none; text-align: left; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <div class="input-group">
+                    <label>Ending Page Number</label>
+                    <input type="number" id="sessionEndPage" class="input-field">
+                </div>
+                <button class="btn-primary" onclick="saveSession()">Log Session</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"><i class="ri-check-line" style="color:var(--primary)"></i> <span id="toastMsg">Action Saved</span></div>
+
+    <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // --- State Management ---
+        let library = JSON.parse(localStorage.getItem('luminaLib_v2')) || [];
+        let currentFilter = 'all';
+        let activeBookIndex = null;
+        
+        // Timer State
+        let timerInterval;
+        let seconds = 0;
+        let isTimerRunning = false;
+        let activeTimerBookIndex = null;
+
+        // Gradients for auto-covers
+        const gradients = [
+            "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
+            "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+            "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+            "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+            "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
+            "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+        ];
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if(savedTheme === 'dark') document.body.setAttribute('data-theme', 'dark');
+            
+            document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            renderLibrary();
+            updateStats();
+        });
+
+        // --- Core Functions ---
+
+        function saveLocal() {
+            localStorage.setItem('luminaLib_v2', JSON.stringify(library));
+            updateStats();
+        }
+
+        function updateStats() {
+            // Stats
+            const totalRead = library.reduce((acc, b) => acc + (parseInt(b.current) || 0), 0);
+            const finished = library.filter(b => parseInt(b.current) >= parseInt(b.total)).length;
+            
+            document.getElementById('statRead').textContent = totalRead.toLocaleString();
+            document.getElementById('statFinished').textContent = finished;
+
+            // Streak Logic (Checking unique dates in sessions)
+            let dates = new Set();
+            library.forEach(book => {
+                if(book.sessions) {
+                    book.sessions.forEach(s => dates.add(s.date.split('T')[0]));
+                }
+            });
+            
+            // Simplified streak calc (just count unique days for now, complex consecutive logic is heavy)
+            // Ideally: sort dates, check gaps.
+            const sortedDates = Array.from(dates).sort();
+            let streak = 0;
+            let currentStreak = 0;
+            if(sortedDates.length > 0) {
+                // Check if last read was today or yesterday
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                const lastDate = sortedDates[sortedDates.length - 1];
+
+                if(lastDate === today || lastDate === yesterday) {
+                    // Calculate backwards
+                    currentStreak = 1;
+                    for(let i = sortedDates.length - 1; i > 0; i--) {
+                        const d1 = new Date(sortedDates[i]);
+                        const d2 = new Date(sortedDates[i-1]);
+                        const diffTime = Math.abs(d1 - d2);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        if(diffDays === 1) currentStreak++;
+                        else break;
+                    }
+                }
+            }
+            document.getElementById('statStreak').textContent = currentStreak;
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('libraryGrid');
+            grid.innerHTML = '';
+            
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = library.map((book, index) => ({...book, originalIndex: index}))
+                .filter(book => {
+                    const matchesSearch = book.title.toLowerCase().includes(search) || book.author.toLowerCase().includes(search);
+                    const isFinished = parseInt(book.current) >= parseInt(book.total);
+                    const isStarted = parseInt(book.current) > 0;
+                    
+                    let matchesFilter = true;
+                    if (currentFilter === 'reading') matchesFilter = isStarted && !isFinished;
+                    if (currentFilter === 'toread') matchesFilter = !isStarted;
+                    if (currentFilter === 'finished') matchesFilter = isFinished;
+
+                    return matchesSearch && matchesFilter;
+                });
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><i class="ri-book-3-line empty-icon"></i><p>No books found. Add one to get started!</p></div>`;
+                return;
+            }
+
+            filtered.forEach(book => {
+                const pct = Math.min(100, Math.round((book.current / book.total) * 100));
+                const isFinished = pct === 100;
+                
+                // Cover Logic
+                let coverStyle = '';
+                if(book.cover && book.cover.startsWith('http')) {
+                    coverStyle = `background-image: url('${book.cover}')`;
+                } else {
+                    coverStyle = `background: ${gradients[book.originalIndex % gradients.length]}`;
+                }
+
+                grid.innerHTML += `
+                    <div class="book-card" onclick="editBook(${book.originalIndex})">
+                        <div class="book-cover-area" style="${coverStyle}">
+                            <div class="book-overlay"></div>
+                            ${isFinished ? '<span class="book-status-badge" style="background:#10b981">Finished</span>' : ''}
+                            ${!isFinished && pct > 0 ? '<span class="book-status-badge" style="background:var(--primary)">Reading</span>' : ''}
+                        </div>
+                        <div class="book-body">
+                            <h3 class="book-title">${book.title}</h3>
+                            <div class="book-author">${book.author}</div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-track">
+                                    <div class="progress-bar" style="width: ${pct}%"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>${pct}%</span>
+                                    <span>${book.current}/${book.total} pgs</span>
+                                </div>
+                            </div>
+
+                            <div class="book-actions">
+                                <button class="btn-card btn-read" onclick="event.stopPropagation(); openTimer(${book.originalIndex})">
+                                    <i class="ri-time-line"></i> Read
+                                </button>
+                                <button class="btn-card btn-edit" onclick="event.stopPropagation(); editBook(${book.originalIndex})">
+                                    <i class="ri-edit-line"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- CRUD Operations ---
+
+        function openBookModal() {
+            document.getElementById('modalTitleText').textContent = 'Add Book';
+            document.getElementById('editIndex').value = '';
+            document.getElementById('btnDelete').style.display = 'none';
+            // Clear fields
+            ['inpTitle','inpAuthor','inpTotal','inpCurrent','inpCover','inpRating','inpNotes'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('bookModal').classList.add('active');
+        }
+
+        function editBook(index) {
+            const book = library[index];
+            activeBookIndex = index;
+            document.getElementById('modalTitleText').textContent = 'Edit Details';
+            document.getElementById('editIndex').value = index;
+            document.getElementById('inpTitle').value = book.title;
+            document.getElementById('inpAuthor').value = book.author;
+            document.getElementById('inpTotal').value = book.total;
+            document.getElementById('inpCurrent').value = book.current;
+            document.getElementById('inpCover').value = book.cover || '';
+            document.getElementById('inpGenre').value = book.genre;
+            document.getElementById('inpRating').value = book.rating || '';
+            document.getElementById('inpNotes').value = book.notes || '';
+            
+            document.getElementById('btnDelete').style.display = 'block';
+            document.getElementById('bookModal').classList.add('active');
+        }
+
+        function saveBook() {
+            const idxStr = document.getElementById('editIndex').value;
+            const newBook = {
+                title: document.getElementById('inpTitle').value,
+                author: document.getElementById('inpAuthor').value,
+                total: parseInt(document.getElementById('inpTotal').value) || 0,
+                current: parseInt(document.getElementById('inpCurrent').value) || 0,
+                cover: document.getElementById('inpCover').value,
+                genre: document.getElementById('inpGenre').value,
+                rating: document.getElementById('inpRating').value,
+                notes: document.getElementById('inpNotes').value,
+                sessions: [],
+                added: new Date().toISOString()
+            };
+
+            if(!newBook.title) return showToast('Title is required!', true);
+
+            if(idxStr !== '') {
+                // Keep sessions history on edit
+                newBook.sessions = library[parseInt(idxStr)].sessions || [];
+                newBook.added = library[parseInt(idxStr)].added;
+                library[parseInt(idxStr)] = newBook;
+            } else {
+                library.unshift(newBook);
+            }
+
+            saveLocal();
+            closeModal('bookModal');
+            renderLibrary();
+            showToast('Book Saved Successfully');
+        }
+
+        function deleteCurrentBook() {
+            if(activeBookIndex === null) return;
+            if(confirm('Are you sure you want to delete this book?')) {
+                library.splice(activeBookIndex, 1);
+                saveLocal();
+                closeModal('bookModal');
+                renderLibrary();
+                showToast('Book Deleted');
+            }
+        }
+
+        // --- Timer Logic ---
+
+        function openTimer(index) {
+            activeTimerBookIndex = index;
+            document.getElementById('timerBookTitle').textContent = library[index].title;
+            document.getElementById('timerModal').classList.add('active');
+            // Reset
+            seconds = 0;
+            isTimerRunning = false;
+            updateTimerDisplay();
+            document.getElementById('sessionLogForm').style.display = 'none';
+        }
+
+        function updateTimerDisplay() {
+            const hrs = Math.floor(seconds / 3600).toString().padStart(2,'0');
+            const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2,'0');
+            const secs = (seconds % 60).toString().padStart(2,'0');
+            document.getElementById('stopwatch').textContent = `${hrs}:${mins}:${secs}`;
+        }
+
+        function startTimer() {
+            if(isTimerRunning) return;
+            isTimerRunning = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+        }
+
+        function stopTimer() {
+            pauseTimer();
+            // Show logging form
+            document.getElementById('sessionLogForm').style.display = 'block';
+            document.getElementById('sessionEndPage').value = library[activeTimerBookIndex].current;
+            document.getElementById('sessionEndPage').focus();
+        }
+
+        function saveSession() {
+            const endPage = parseInt(document.getElementById('sessionEndPage').value);
+            const book = library[activeTimerBookIndex];
+            
+            if(isNaN(endPage)) return;
+
+            const pagesRead = endPage - book.current;
+            const durationMinutes = Math.ceil(seconds / 60);
+
+            // Log session
+            if(!book.sessions) book.sessions = [];
+            book.sessions.push({
+                date: new Date().toISOString(),
+                duration: durationMinutes,
+                pages: pagesRead > 0 ? pagesRead : 0
+            });
+
+            // Update progress
+            book.current = endPage;
+            if(book.current > book.total) book.current = book.total;
+
+            // Check completion
+            if(book.current === book.total) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
+
+            saveLocal();
+            closeTimerModal();
+            renderLibrary();
+            showToast(`Logged ${durationMinutes} mins of reading!`);
+        }
+
+        function closeTimerModal() {
+            pauseTimer();
+            document.getElementById('timerModal').classList.remove('active');
+        }
+
+        // --- Utilities ---
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function setFilter(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderLibrary();
+        }
+
+        function toggleTheme() {
+            if(document.body.getAttribute('data-theme') === 'dark') {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.style.borderColor = isError ? '#ef4444' : 'var(--primary)';
+            t.classList.add('visible');
+            setTimeout(() => t.classList.remove('visible'), 3000);
+        }
+
+        // --- Data Persistence ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(library));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "lumina_library_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(Array.isArray(data)) {
+                        library = data;
+                        saveLocal();
+                        renderLibrary();
+                        showToast('Library Restored Successfully');
+                    }
+                } catch(err) {
+                    showToast('Invalid File', true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Close Modals on outside click
+        window.onclick = function(e) {
+            if(e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active');
+                if(e.target.id === 'timerModal') pauseTimer();
+            }
+        }
+    </script>
+</body>
+</html>
